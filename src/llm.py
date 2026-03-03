@@ -3,8 +3,20 @@ from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
-# Make sure GEMINI_API_KEY is set in your environment
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+
+llm = HuggingFaceEndpoint(
+    repo_id="Qwen/Qwen3-4B-Instruct-2507",
+    huggingfacehub_api_token=f"{os.getenv('HUGGINGFACE_API_KEY')}",
+    task="text-generation",
+    max_new_tokens=256,
+    temperature=0.7,
+)
+
+chat_model = ChatHuggingFace(llm=llm)
+
 
 
 def generate_answer(context_chunks, question: str) -> str:
@@ -34,9 +46,6 @@ Question:
 Answer:
 """
 
-    response = client.models.generate_content(
-        model="models/gemini-flash-latest",
-        contents=prompt
-    )
+    response = chat_model.invoke(prompt)
 
     return response.text.strip()

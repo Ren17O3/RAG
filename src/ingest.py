@@ -1,11 +1,10 @@
+from importlib.resources import path
 import os
 from pypdf import PdfReader
 from pdf2image import convert_from_path
-import pytesseract
 
 
 def extract_pages_from_pdf(file_path: str) -> list[dict]:
-    
     if(not os.path.exists(file_path)):
         raise FileNotFoundError("file not found")
     
@@ -14,31 +13,13 @@ def extract_pages_from_pdf(file_path: str) -> list[dict]:
     for pageno,page in enumerate(reader.pages,start = 1):
         text = (page.extract_text() or "").strip()
         
-        if len(text) >= 50:
-            records.append({
+        records.append({
                 "text": text,
                 "doc_name": os.path.basename(file_path),
                 "page": pageno,
-                "source": "text"
+                "source": "pdf"
             })
-            continue
-        
-        # If text is less than 50 chars, use OCR
-        images = convert_from_path(
-            file_path,
-            first_page=pageno,
-            last_page=pageno
-        )
-        ocr_text = pytesseract.image_to_string(images[0]).strip()
-
-        if ocr_text:
-            records.append({
-                "text": ocr_text,
-                "doc_name": os.path.basename(file_path),
-                "page": pageno,
-                "source": "ocr"
-            })
-
+            
     return records
 
 
@@ -81,8 +62,13 @@ def load_documents(file_paths):
         if ext.endswith(".pdf"):
             all_records.extend(extract_pages_from_pdf(path))
 
-        elif ext.endswith(".ppt") or ext.endswith(".pptx"):
+        elif ext.endswith(".pptx"):
             all_records.extend(extract_slides_from_ppt(path))
+
+        elif ext.endswith(".ppt"):
+            raise ValueError(
+                f"Old .ppt files are not supported. Please convert '{os.path.basename(path)}' to .pptx."
+            )
 
         else:
             raise ValueError(f"Unsupported file type: {path}")
