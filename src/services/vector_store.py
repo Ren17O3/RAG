@@ -2,15 +2,16 @@ import faiss
 import pickle
 import os
 import numpy as np
+from src.schemas.models import DocumentRecord, ChunkRecord
 
 
 class VectorStore:
     def __init__(self, embedding_dim: int):
         # Inner Product index (cosine similarity with normalized vectors)
         self.index = faiss.IndexFlatIP(embedding_dim)
-        self.records: list[dict] = []
+        self.records: list[ChunkRecord] = []
 
-    def add(self, embeddings: np.ndarray, records: list[dict]):
+    def add(self, embeddings: np.ndarray, records: list[ChunkRecord]):
         """
         Add embeddings and their corresponding metadata records.
         Order MUST be preserved.
@@ -22,17 +23,20 @@ class VectorStore:
         """
         Search the index and return top_k matching chunks with metadata.
         """
+        query_embedding = np.asarray(query_embedding, dtype="float32")
+
+        if query_embedding.ndim == 1:
+            query_embedding = np.expand_dims(query_embedding, axis=0)
+        if self.index.ntotal == 0:
+            return []
         scores, indices = self.index.search(query_embedding, top_k)
 
         results = []
         for score, idx in zip(scores[0], indices[0]):
+            if idx == -1:
+                continue
             record = self.records[idx]
-            results.append({
-                "score": float(score),
-                "text": record["text"],
-                "doc_name": record["doc_name"],
-                "page": record["page"]
-            })
+            results.append({"score": float(score), "chunk": record})
 
         return results
 

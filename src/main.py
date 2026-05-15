@@ -1,33 +1,20 @@
-from ingest import load_documents
-from chunk import chunk_documents
-from embed import Embedder
-from vector_store import VectorStore
-from llm import generate_answer
+from fastapi import FastAPI
+from src.api.ingest import router as ingest_router
+from src.api.query import router as query_router
+from src.api.reset import router as reset_router
+from src.api.document import router as doc_router
+from fastapi.middleware.cors import CORSMiddleware
 
-# Build index (run once)
-records = load_documents(["data/AI & ML DIGITAL NOTES.pdf"])
-chunks = chunk_documents(records)
+app = FastAPI()
 
-embedder = Embedder()
-embeddings = embedder.embed_texts([c["text"] for c in chunks])
-
-store = VectorStore(embeddings.shape[1])
-store.add(embeddings, chunks)
-store.save("data/index")
-
-# Query time
-store = VectorStore.load("data/index")
-
-question = "What is deep learning?"
-
-q_emb = embedder.embed_texts([question])
-results = store.search(q_emb, top_k=3)
-
-context_chunks = [
-    f"[{r['doc_name']} | Page {r['page']}]\n{r['text']}"
-    for r in results
-]
-
-answer = generate_answer(context_chunks, question)
-
-print(answer)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(ingest_router, prefix="/api", tags=["ingestion"])
+app.include_router(query_router, prefix="/api", tags=["query"])
+app.include_router(reset_router, prefix="/api", tags=["reset"])
+app.include_router(doc_router, prefix="/api", tags=["documents"])
