@@ -5,9 +5,16 @@ from sentence_transformers import SentenceTransformer
 
 class Embedder:
 
-    def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5"):
+    _model = None
 
-        self.model = SentenceTransformer(model_name)
+    @classmethod
+    def get_model(cls):
+
+        if cls._model is None:
+
+            cls._model = SentenceTransformer("BAAI/bge-small-en-v1.5")
+
+        return cls._model
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
         """

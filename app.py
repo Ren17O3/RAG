@@ -7,7 +7,7 @@ import time
 # CONFIG
 # -----------------------------------
 
-API_BASE_URL = "http://127.0.0.1:8000/api"
+API_BASE_URL = "https://rag-gt2l.onrender.com/api"
 
 st.set_page_config(
     page_title="Syllabus RAG",
