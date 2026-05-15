@@ -105,6 +105,7 @@ LLM Generation
 
 * BAAI/bge-small-en-v1.5
 * Qwen/Qwen3-4B-Instruct-2507
+* cross-encoder/ms-marco-MiniLM-L-6-v2
 
 ---
 

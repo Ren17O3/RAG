@@ -14,8 +14,6 @@ from src.core.store_manager import load_or_create_store, get_session_store_path
 
 router = APIRouter()
 
-embedder = Embedder()
-
 ALLOWED_EXTENSIONS = [".pdf", ".pptx"]
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
@@ -24,6 +22,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 async def ingest_documents(
     session_id: str, files: Annotated[List[UploadFile], File(...)]
 ):
+    embedder = Embedder()
 
     temp_files = []
 
