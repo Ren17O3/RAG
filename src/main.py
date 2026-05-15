@@ -18,3 +18,13 @@ app.include_router(ingest_router, prefix="/api", tags=["ingestion"])
 app.include_router(query_router, prefix="/api", tags=["query"])
 app.include_router(reset_router, prefix="/api", tags=["reset"])
 app.include_router(doc_router, prefix="/api", tags=["documents"])
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def root():
+
+    return {"message": "working"}
