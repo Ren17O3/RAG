@@ -6,7 +6,5 @@ from src.api.document import router as doc_router
 
 app = FastAPI()
 
-app.include_router(ingest_router, prefix="/api", tags=["ingestion"])
-app.include_router(query_router, prefix="/api", tags=["query"])
 app.include_router(reset_router, prefix="/api", tags=["reset"])
 app.include_router(doc_router, prefix="/api", tags=["documents"])
