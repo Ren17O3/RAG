@@ -9,11 +9,11 @@ from src.services.generator import generate_answer
 from src.services.query_rewriter import rewrite_query
 
 router = APIRouter()
+retriever = Retriever()
 
 
 @router.post("/query")
 async def query_documents(request: QueryRequest):
-    retriever = Retriever()
 
     original_query = request.query
 
