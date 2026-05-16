@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from src.api.ingest import router as ingest_router
-from src.api.query import router as query_router
+
 from src.api.reset import router as reset_router
 from src.api.document import router as doc_router
 
